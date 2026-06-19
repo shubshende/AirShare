@@ -140,6 +140,7 @@ public partial class MainWindow : Window
     }
 
     private string _currentAirPlayIp = "";
+    private readonly object _logLock = new object();
 
     private void WriteCoreLog(string logPath, string? line)
     {
@@ -150,7 +151,10 @@ public partial class MainWindow : Window
 
         try
         {
-            File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {line}{Environment.NewLine}");
+            lock (_logLock)
+            {
+                File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {line}{Environment.NewLine}");
+            }
 
             if (line.Contains("Client connected: "))
             {
@@ -162,9 +166,10 @@ public partial class MainWindow : Window
                 UpdateStatus($"AirPlay screen mirroring active (IP: {_currentAirPlayIp}).");
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Logging must never take down the receiver.
+            // Logging must never take down the receiver, but write to debug if possible.
+            System.Diagnostics.Debug.WriteLine($"Log error: {ex.Message}");
         }
     }
 
