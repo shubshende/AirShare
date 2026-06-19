@@ -102,7 +102,7 @@ static string[] BuildPlaybackArgs(string profile, string inputPath)
             "-fflags", "+genpts",
             "-flags", "low_delay",
             "-vf", "setpts=0",
-            "-sync", "ext"
+            "-sync", "video"
         }
     };
 
