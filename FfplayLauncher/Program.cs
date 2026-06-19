@@ -11,6 +11,10 @@ if (!File.Exists(realFfplayPath))
 }
 
 var inputPath = args.LastOrDefault(arg => !arg.StartsWith('-') && arg.Contains("AirPlayVideo", StringComparison.OrdinalIgnoreCase));
+if (inputPath is null && args.Length == 0)
+{
+    inputPath = @"\\.\pipe\AirPlayVideo";
+}
 var profile = ReadProfile(appDirectory);
 var playbackArgs = inputPath is null
     ? args
@@ -97,14 +101,12 @@ static string[] BuildPlaybackArgs(string profile, string inputPath)
         },
         _ => new[]
         {
-            "-framerate", "60",
             "-probesize", "32768",
             "-analyzeduration", "0",
-            "-fflags", "nobuffer",
+            "-fflags", "+genpts",
             "-flags", "low_delay",
-            "-framedrop",
-            "-strict", "experimental",
-            "-sync", "video"
+            "-vf", "setpts=0",
+            "-sync", "ext"
         }
     };
 
