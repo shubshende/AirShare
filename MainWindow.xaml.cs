@@ -226,40 +226,26 @@ public partial class MainWindow : Window
         });
     }
 
+    private bool _isExiting = false;
+
     private void MenuItem_Exit_Click(object sender, RoutedEventArgs e)
     {
+        _isExiting = true;
         StopAirPlayCore();
         Application.Current.Shutdown();
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
-        this.Hide();
-        MyNotifyIcon.ShowBalloonTip("AirReceiver", "Running in the background", BalloonIcon.Info);
-    }
-
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        this.WindowState = WindowState.Minimized;
-    }
-
-    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (this.WindowState == WindowState.Maximized)
-            this.WindowState = WindowState.Normal;
-        else
-            this.WindowState = WindowState.Maximized;
-    }
-
-    private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (e.ClickCount == 2)
+        if (!_isExiting)
         {
-            MaximizeButton_Click(sender, e);
+            e.Cancel = true;
+            this.Hide();
+            MyNotifyIcon.ShowBalloonTip("AirReceiver", "Running in the background", BalloonIcon.Info);
         }
         else
         {
-            this.DragMove();
+            base.OnClosing(e);
         }
     }
 
