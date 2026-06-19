@@ -1,0 +1,15 @@
+# .gitignore
+bin/
+obj/
+publish/
+dist/
+AirplayCore/
+AirplayCore.zip
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+ffplay_launcher.log
+AirPlayCore.log
+ffplay_final_args.txt
