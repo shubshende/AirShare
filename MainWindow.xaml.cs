@@ -203,6 +203,48 @@ public partial class MainWindow : Window
         UpdateStatus("Install the Wireless Display optional feature, then reopen Wireless Display.");
     }
     
+    private void ReopenAirPlayWindow_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var airPlayCoreDirectory = FindAirPlayCoreDirectory();
+            if (airPlayCoreDirectory is null)
+            {
+                UpdateStatus("Error: AirplayCore folder was not found.");
+                return;
+            }
+
+            var ffplayPath = Path.Combine(airPlayCoreDirectory, "ffplay.exe");
+            if (File.Exists(ffplayPath))
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = ffplayPath,
+                    WorkingDirectory = airPlayCoreDirectory,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                Process.Start(startInfo);
+                UpdateStatus("Reopened AirPlay video window.");
+            }
+            else
+            {
+                UpdateStatus("Error: ffplay.exe not found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus($"Error reopening window: {ex.Message}");
+        }
+    }
+
+    private void DisconnectAirPlay_Click(object sender, RoutedEventArgs e)
+    {
+        StopAirPlayCore();
+        StartAirPlayCore();
+        UpdateStatus("AirPlay connection disconnected. Ready for new connections.");
+    }
+    
     protected override void OnClosed(EventArgs e)
     {
         StopAirPlayCore();
