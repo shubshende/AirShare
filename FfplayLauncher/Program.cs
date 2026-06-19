@@ -110,6 +110,7 @@ static string[] BuildPlaybackArgs(string profile, string inputPath)
         },
         _ => new[]
         {
+            "-hwaccel", "auto",
             "-probesize", "32768",
             "-analyzeduration", "0",
             "-fflags", "+genpts",
