@@ -58,7 +58,18 @@ public partial class MainWindow : Window
                 };
                 _airPlayProcess.OutputDataReceived += (_, e) => WriteCoreLog(logPath, e.Data);
                 _airPlayProcess.ErrorDataReceived += (_, e) => WriteCoreLog(logPath, e.Data);
-                _airPlayProcess.Exited += (_, _) => UpdateStatus($"AirPlay Engine stopped. Check {Path.GetFileName(logPath)}.");
+                _airPlayProcess.Exited += async (_, _) =>
+                {
+                    UpdateStatus("AirPlay connection closed.");
+                    await System.Threading.Tasks.Task.Delay(1000);
+                    if (!Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
+                    {
+                        Dispatcher.BeginInvoke(() =>
+                        {
+                            StartAirPlayCore();
+                        });
+                    }
+                };
 
                 _airPlayProcess.Start();
                 _airPlayProcess.BeginOutputReadLine();

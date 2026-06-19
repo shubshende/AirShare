@@ -39,15 +39,24 @@ File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Original args
 File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Profile: {profile}{Environment.NewLine}");
 File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Starting ffplay_real.exe {string.Join(' ', startInfo.ArgumentList.Select(Quote))}{Environment.NewLine}");
 
-using var ffplay = Process.Start(startInfo);
-if (ffplay is null)
+using var process = Process.Start(startInfo);
+if (process is not null)
 {
-    File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Failed to start ffplay_real.exe{Environment.NewLine}");
-    return 3;
+    process.WaitForExit();
+
+    // UX Enhancement: If the video window closes, kill the AirPlay engine 
+    // to force the iOS device to disconnect completely.
+    var airPlayProcs = Process.GetProcessesByName("AirPlay");
+    foreach (var p in airPlayProcs)
+    {
+        try { p.Kill(); } catch { }
+    }
+
+    return process.ExitCode;
 }
 
-ffplay.WaitForExit();
-return ffplay.ExitCode;
+File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Failed to start ffplay_real.exe{Environment.NewLine}");
+return 3;
 
 static string Quote(string value)
 {
