@@ -99,8 +99,10 @@ static string[] BuildPlaybackArgs(string profile, string inputPath)
         {
             "-probesize", "32768",
             "-analyzeduration", "0",
-            "-fflags", "+genpts",
+            "-fflags", "nobuffer+discardcorrupt",
             "-flags", "low_delay",
+            "-framedrop",
+            "-avioflags", "direct",
             "-vf", "setpts=0",
             "-sync", "video"
         }
