@@ -3,7 +3,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Windows;
+using Microsoft.Win32;
 using Hardcodet.Wpf.TaskbarNotification;
 
 namespace AirReceiver;
@@ -18,8 +21,39 @@ public partial class MainWindow : Window
         InitializeComponent();
         MyNotifyIcon.Icon = SystemIcons.Information;
         
+        LoadSettings();
         StartAirPlayCore();
         _ = RefreshMiracastStatusAsync();
+    }
+
+    private void LoadSettings()
+    {
+        try
+        {
+            var airPlayCoreDirectory = FindAirPlayCoreDirectory();
+            if (airPlayCoreDirectory is null) return;
+            var appSettingsPath = Path.Combine(airPlayCoreDirectory, "appsettings_win.json");
+
+            if (File.Exists(appSettingsPath))
+            {
+                var json = File.ReadAllText(appSettingsPath);
+                var root = JsonNode.Parse(json);
+                var instanceName = root?["AirPlayReceiver"]?["Instance"]?.ToString() ?? "SHUBHAM";
+                ReceiverNameTextBox.Text = instanceName;
+
+                var prefs = root?["AirReceiverPrefs"];
+                FullscreenCheckBox.IsChecked = prefs?["Fullscreen"]?.GetValue<bool>() ?? false;
+                BorderlessCheckBox.IsChecked = prefs?["Borderless"]?.GetValue<bool>() ?? false;
+                AlwaysOnTopCheckBox.IsChecked = prefs?["AlwaysOnTop"]?.GetValue<bool>() ?? false;
+            }
+
+            var startupKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false);
+            StartupCheckBox.IsChecked = startupKey?.GetValue("AirReceiver") != null;
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus($"Error loading settings: {ex.Message}");
+        }
     }
 
     private void StartAirPlayCore()
@@ -236,6 +270,97 @@ public partial class MainWindow : Window
         StopAirPlayCore();
         StartAirPlayCore();
         UpdateStatus("AirPlay connection disconnected. Ready for new connections.");
+    }
+    
+    private void SaveSettings_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var airPlayCoreDirectory = FindAirPlayCoreDirectory();
+            if (airPlayCoreDirectory is null) return;
+            var appSettingsPath = Path.Combine(airPlayCoreDirectory, "appsettings_win.json");
+
+            if (File.Exists(appSettingsPath))
+            {
+                var json = File.ReadAllText(appSettingsPath);
+                var root = JsonNode.Parse(json) as JsonObject;
+                if (root != null)
+                {
+                    if (root["AirPlayReceiver"] is JsonObject receiver)
+                    {
+                        receiver["Instance"] = ReceiverNameTextBox.Text;
+                    }
+                    else
+                    {
+                        root["AirPlayReceiver"] = new JsonObject { ["Instance"] = ReceiverNameTextBox.Text };
+                    }
+
+                    var prefs = root["AirReceiverPrefs"] as JsonObject ?? new JsonObject();
+                    prefs["Fullscreen"] = FullscreenCheckBox.IsChecked == true;
+                    prefs["Borderless"] = BorderlessCheckBox.IsChecked == true;
+                    prefs["AlwaysOnTop"] = AlwaysOnTopCheckBox.IsChecked == true;
+                    root["AirReceiverPrefs"] = prefs;
+
+                    File.WriteAllText(appSettingsPath, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                }
+            }
+
+            // Handle Startup
+            var startupKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+            if (StartupCheckBox.IsChecked == true)
+            {
+                startupKey?.SetValue("AirReceiver", Process.GetCurrentProcess().MainModule?.FileName ?? "");
+            }
+            else
+            {
+                startupKey?.DeleteValue("AirReceiver", false);
+            }
+
+            UpdateStatus("Settings saved! Restarting AirPlay engine to apply...");
+            DisconnectAirPlay_Click(sender, e);
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus($"Error saving settings: {ex.Message}");
+        }
+    }
+
+    private void FixFirewall_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "netsh",
+                Arguments = "advfirewall firewall add rule name=\"AirReceiver AirPlay\" dir=in action=allow protocol=TCP localport=7000,5000",
+                Verb = "runas", // Request Admin privileges
+                UseShellExecute = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            Process.Start(startInfo);
+            UpdateStatus("Firewall rules updated for AirPlay ports (7000, 5000).");
+        }
+        catch (Exception)
+        {
+            UpdateStatus("Firewall fix cancelled or failed. Please run app as Administrator.");
+        }
+    }
+
+    private void MenuItem_Open_Click(object sender, RoutedEventArgs e)
+    {
+        this.Show();
+        this.WindowState = WindowState.Normal;
+        this.Activate();
+    }
+
+    private void MenuItem_FixFirewall_Click(object sender, RoutedEventArgs e)
+    {
+        FixFirewall_Click(sender, e);
+    }
+
+    private void MyNotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+    {
+        MenuItem_Open_Click(sender, e);
     }
     
     protected override void OnClosed(EventArgs e)

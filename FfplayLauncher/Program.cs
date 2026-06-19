@@ -18,7 +18,7 @@ if (inputPath is null && args.Length == 0)
 var profile = ReadProfile(appDirectory);
 var playbackArgs = inputPath is null
     ? args
-    : BuildPlaybackArgs(profile, inputPath);
+    : BuildPlaybackArgs(appDirectory, profile, inputPath);
 
 var startInfo = new ProcessStartInfo
 {
@@ -78,17 +78,34 @@ static string ReadProfile(string appDirectory)
     return profile is "stable" or "balanced" or "fast" ? profile : "fast";
 }
 
-static string[] BuildPlaybackArgs(string profile, string inputPath)
+static string[] BuildPlaybackArgs(string appDirectory, string profile, string inputPath)
 {
-    var common = new[]
+    var commonList = new System.Collections.Generic.List<string>
     {
         "-window_title", "AirReceiver Video",
-        "-alwaysontop",
         "-left", "80",
         "-top", "40",
         "-x", "520",
         "-f", "h264"
     };
+
+    try
+    {
+        var appSettingsPath = Path.Combine(appDirectory, "appsettings_win.json");
+        if (File.Exists(appSettingsPath))
+        {
+            var json = File.ReadAllText(appSettingsPath);
+            var root = System.Text.Json.Nodes.JsonNode.Parse(json);
+            var prefs = root?["AirReceiverPrefs"];
+            if (prefs != null)
+            {
+                if (prefs["Fullscreen"]?.GetValue<bool>() == true) commonList.Add("-fs");
+                if (prefs["Borderless"]?.GetValue<bool>() == true) commonList.Add("-noborder");
+                if (prefs["AlwaysOnTop"]?.GetValue<bool>() == true) commonList.Add("-alwaysontop");
+            }
+        }
+    }
+    catch { } // Default to no extra flags if parsing fails
 
     var profileArgs = profile switch
     {
@@ -119,5 +136,5 @@ static string[] BuildPlaybackArgs(string profile, string inputPath)
         }
     };
 
-    return common.Concat(profileArgs).Append(inputPath).ToArray();
+    return commonList.Concat(profileArgs).Append(inputPath).ToArray();
 }

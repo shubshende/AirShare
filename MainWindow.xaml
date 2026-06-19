@@ -6,55 +6,89 @@
         WindowStyle="None" AllowsTransparency="True" Background="#111111" WindowStartupLocation="CenterScreen">
     <Grid>
         <tb:TaskbarIcon x:Name="MyNotifyIcon"
-            ToolTipText="AirReceiver - Ready">
+            ToolTipText="AirReceiver - Ready" TrayMouseDoubleClick="MyNotifyIcon_TrayMouseDoubleClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Open AirReceiver" Click="MenuItem_Open_Click" />
+                    <Separator />
+                    <MenuItem Header="Fix Firewall" Click="MenuItem_FixFirewall_Click" />
+                    <Separator />
                     <MenuItem Header="Exit" Click="MenuItem_Exit_Click" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
 
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="620">
-            <TextBlock Text="AirReceiver" Foreground="White" HorizontalAlignment="Center" FontSize="32" FontWeight="Bold"/>
-            <TextBlock x:Name="StatusText" Text="Waiting for screen mirroring connections..." Foreground="#AAAAAA" HorizontalAlignment="Center" Margin="0,16,0,0" FontSize="16" TextAlignment="Center" TextWrapping="Wrap"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Width="620" Margin="0,30,0,30">
+                <TextBlock Text="AirReceiver" Foreground="White" HorizontalAlignment="Center" FontSize="32" FontWeight="Bold"/>
+                <TextBlock x:Name="StatusText" Text="Waiting for screen mirroring connections..." Foreground="#AAAAAA" HorizontalAlignment="Center" Margin="0,16,0,0" FontSize="16" TextAlignment="Center" TextWrapping="Wrap"/>
 
-            <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="8" Margin="0,34,0,0" Padding="20" Background="#181818">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="8" Margin="0,34,0,0" Padding="20" Background="#181818">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Text="Android / Windows Cast" Foreground="White" FontSize="18" FontWeight="SemiBold" />
-                    <TextBlock x:Name="MiracastStatusText" Grid.Row="1" Text="Checking Wireless Display support..." Foreground="#B8B8B8" Margin="0,8,0,18" TextWrapping="Wrap" />
+                        <TextBlock Text="Android / Windows Cast" Foreground="White" FontSize="18" FontWeight="SemiBold" />
+                        <TextBlock x:Name="MiracastStatusText" Grid.Row="1" Text="Checking Wireless Display support..." Foreground="#B8B8B8" Margin="0,8,0,18" TextWrapping="Wrap" />
 
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Open Wireless Display" Width="170" Height="34" Margin="0,0,10,0" Click="OpenWirelessDisplay_Click" />
-                        <Button Content="Projection Settings" Width="150" Height="34" Margin="0,0,10,0" Click="OpenProjectionSettings_Click" />
-                        <Button Content="Optional Features" Width="130" Height="34" Click="InstallWirelessDisplay_Click" />
-                    </StackPanel>
-                </Grid>
-            </Border>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Open Wireless Display" Width="170" Height="34" Margin="0,0,10,0" Click="OpenWirelessDisplay_Click" />
+                            <Button Content="Projection Settings" Width="150" Height="34" Margin="0,0,10,0" Click="OpenProjectionSettings_Click" />
+                            <Button Content="Optional Features" Width="130" Height="34" Click="InstallWirelessDisplay_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
-            <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="8" Margin="0,16,0,0" Padding="20" Background="#181818">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="8" Margin="0,16,0,0" Padding="20" Background="#181818">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Text="Apple AirPlay" Foreground="White" FontSize="18" FontWeight="SemiBold" />
-                    <TextBlock Text="Manage your AirPlay screen mirroring session." Foreground="#B8B8B8" Grid.Row="1" Margin="0,8,0,18" TextWrapping="Wrap" />
+                        <TextBlock Text="Apple AirPlay" Foreground="White" FontSize="18" FontWeight="SemiBold" />
+                        <TextBlock Text="Manage your AirPlay screen mirroring session." Foreground="#B8B8B8" Grid.Row="1" Margin="0,8,0,18" TextWrapping="Wrap" />
 
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Disconnect Devices" Width="150" Height="34" Click="DisconnectAirPlay_Click" />
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </StackPanel>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Disconnect Devices" Width="150" Height="34" Click="DisconnectAirPlay_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="8" Margin="0,16,0,0" Padding="20" Background="#181818">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Settings" Foreground="White" FontSize="18" FontWeight="SemiBold" />
+                        <StackPanel Grid.Row="1" Margin="0,12,0,18">
+                            <Grid Margin="0,0,0,12">
+                                <TextBlock Text="AirPlay Receiver Name:" Foreground="#B8B8B8" VerticalAlignment="Center" FontSize="14" />
+                                <TextBox x:Name="ReceiverNameTextBox" Width="250" HorizontalAlignment="Right" Background="#222" Foreground="White" BorderBrush="#555" Padding="4" FontSize="14" />
+                            </Grid>
+
+                            <CheckBox x:Name="FullscreenCheckBox" Content="Launch Video in Fullscreen" Foreground="#B8B8B8" Margin="0,0,0,8" FontSize="14" />
+                            <CheckBox x:Name="BorderlessCheckBox" Content="Borderless Window" Foreground="#B8B8B8" Margin="0,0,0,8" FontSize="14" />
+                            <CheckBox x:Name="AlwaysOnTopCheckBox" Content="Always on Top" Foreground="#B8B8B8" Margin="0,0,0,8" FontSize="14" />
+                            <CheckBox x:Name="StartupCheckBox" Content="Run AirReceiver silently at Startup" Foreground="#B8B8B8" Margin="0,0,0,8" FontSize="14" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Fix Firewall" Width="100" Height="34" Margin="0,0,10,0" Click="FixFirewall_Click" />
+                            <Button Content="Save Settings" Width="130" Height="34" Click="SaveSettings_Click" Background="#0078D7" Foreground="White" BorderThickness="0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
         
-        <Button Content="X" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Background="Transparent" Foreground="White" BorderThickness="0" Click="CloseButton_Click" FontSize="16"/>
+        <Button Content="X" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Background="Transparent" Foreground="#666" BorderThickness="0" Click="CloseButton_Click" FontSize="16" />
     </Grid>
 </Window>
