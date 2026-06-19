@@ -97,13 +97,13 @@ static string[] BuildPlaybackArgs(string profile, string inputPath)
         },
         _ => new[]
         {
+            "-framerate", "60",
             "-probesize", "32768",
             "-analyzeduration", "0",
-            "-fflags", "nobuffer+discardcorrupt",
+            "-fflags", "nobuffer",
             "-flags", "low_delay",
             "-framedrop",
-            "-avioflags", "direct",
-            "-vf", "setpts=0",
+            "-strict", "experimental",
             "-sync", "video"
         }
     };
