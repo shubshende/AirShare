@@ -139,6 +139,8 @@ public partial class MainWindow : Window
         File.Copy(ffplayRealPath, ffplayPath);
     }
 
+    private string _currentAirPlayIp = "";
+
     private void WriteCoreLog(string logPath, string? line)
     {
         if (string.IsNullOrWhiteSpace(line))
@@ -152,12 +154,12 @@ public partial class MainWindow : Window
 
             if (line.Contains("Client connected: "))
             {
-                var ip = line.Split(new[] { "Client connected: " }, StringSplitOptions.None)[1].Split(':')[0];
-                UpdateStatus($"AirPlay device connected (IP: {ip}). Audio only or waiting for video.");
+                _currentAirPlayIp = line.Split(new[] { "Client connected: " }, StringSplitOptions.None)[1].Split(':')[0];
+                UpdateStatus($"AirPlay device connected (IP: {_currentAirPlayIp}). Audio only or waiting for video.");
             }
             else if (line.Contains("Video player connected!"))
             {
-                UpdateStatus("AirPlay screen mirroring active.");
+                UpdateStatus($"AirPlay screen mirroring active (IP: {_currentAirPlayIp}).");
             }
         }
         catch
