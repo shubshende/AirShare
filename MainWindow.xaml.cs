@@ -238,6 +238,31 @@ public partial class MainWindow : Window
         MyNotifyIcon.ShowBalloonTip("AirReceiver", "Running in the background", BalloonIcon.Info);
     }
 
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        this.WindowState = WindowState.Minimized;
+    }
+
+    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.WindowState == WindowState.Maximized)
+            this.WindowState = WindowState.Normal;
+        else
+            this.WindowState = WindowState.Maximized;
+    }
+
+    private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            MaximizeButton_Click(sender, e);
+        }
+        else
+        {
+            this.DragMove();
+        }
+    }
+
     private async System.Threading.Tasks.Task RefreshMiracastStatusAsync()
     {
         var status = await _miracastService.GetStatusAsync();
