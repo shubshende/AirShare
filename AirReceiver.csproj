@@ -24,5 +24,8 @@
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
     <PackageReference Include="Makaretu.Dns.Multicast" Version="0.27.0" />
   </ItemGroup>
+  <Target Name="BuildLauncher" BeforeTargets="PrepareForBuild">
+    <MSBuild Projects="FfplayLauncher\FfplayLauncher.csproj" Targets="Publish" Properties="Configuration=$(Configuration);PublishDir=$(MSBuildProjectDirectory)\AirplayCore\;SelfContained=true;RuntimeIdentifier=win-x64;PublishSingleFile=true" />
+  </Target>
 
 </Project>
