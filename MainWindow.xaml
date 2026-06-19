@@ -49,7 +49,6 @@
                     <TextBlock Text="Manage your AirPlay screen mirroring session." Foreground="#B8B8B8" Grid.Row="1" Margin="0,8,0,18" TextWrapping="Wrap" />
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Reopen Video Window" Width="170" Height="34" Margin="0,0,10,0" Click="ReopenAirPlayWindow_Click" />
                         <Button Content="Disconnect Devices" Width="150" Height="34" Click="DisconnectAirPlay_Click" />
                     </StackPanel>
                 </Grid>
