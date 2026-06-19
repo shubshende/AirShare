@@ -19,7 +19,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        MyNotifyIcon.Icon = SystemIcons.Information;
         
         LoadSettings();
         StartAirPlayCore();
